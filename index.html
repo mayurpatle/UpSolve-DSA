@@ -1,0 +1,396 @@
+<!-- DSA Upsolve Tracker v2 -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --paper:#faf7f0; --paper-2:#f3eee2; --card:#fffdf8;
+    --ink:#23211c; --ink-soft:#5c574c; --ink-faint:#928c7d;
+    --line:#e6dfd0; --line-soft:#efe9dc;
+
+    --fresh-bg:#e7f2ea;  --fresh-fg:#2f7d4f;  --fresh-line:#bfe0ca;
+    --settle-bg:#f6efdb; --settle-fg:#977611; --settle-line:#e6d6a6;
+    --fade-bg:#f6e7da;   --fade-fg:#b05f2c;   --fade-line:#ecccab;
+    --revise-bg:#f5dede; --revise-fg:#a23030; --revise-line:#eabcbc;
+
+    --master-bg:#eaf0de; --master-fg:#566a28; --master-line:#d3dcae;
+    --focus-bg:#f1d9d6;  --focus-fg:#8a2222;  --focus-line:#e0aeae;
+
+    --shadow:0 1px 2px rgba(40,35,25,.04), 0 8px 24px rgba(40,35,25,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);}
+  body{
+    font-family:'JetBrains Mono',monospace;color:var(--ink);line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(rgba(40,35,25,.022) 1px, transparent 1px);
+    background-size:5px 5px;padding:34px 18px 80px;
+  }
+  .wrap{max-width:900px;margin:0 auto;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:24px;}
+  .title{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(34px,6vw,52px);letter-spacing:-.02em;line-height:.95;}
+  .title em{font-style:italic;font-weight:400;color:var(--fresh-fg);}
+  .tagline{color:var(--ink-faint);font-size:12.5px;letter-spacing:.04em;margin-top:8px;}
+  .clock{text-align:right;font-size:12px;color:var(--ink-faint);}
+  .clock b{display:block;color:var(--ink-soft);font-weight:600;font-size:14px;letter-spacing:.02em;}
+
+  .composer{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;box-shadow:var(--shadow);margin-bottom:22px;}
+  .composer .row1{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  input[type=text]{flex:1 1 240px;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:inherit;font-size:14.5px;color:var(--ink);transition:border-color .15s,box-shadow .15s;}
+  input[type=text]::placeholder{color:var(--ink-faint);}
+  input[type=text]:focus{outline:none;border-color:var(--fresh-fg);box-shadow:0 0 0 3px var(--fresh-bg);}
+  input[type=date]{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-family:inherit;font-size:13px;color:var(--ink-soft);cursor:pointer;}
+  input[type=date]:focus{outline:none;border-color:var(--fresh-fg);}
+  .diffs{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap;}
+  .diff{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 13px;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);cursor:pointer;transition:all .15s;user-select:none;}
+  .diff:hover{border-color:var(--ink-faint);}
+  .diff[data-on="1"][data-d="Easy"]{background:var(--fresh-bg);color:var(--fresh-fg);border-color:var(--fresh-line);}
+  .diff[data-on="1"][data-d="Medium"]{background:var(--settle-bg);color:var(--settle-fg);border-color:var(--settle-line);}
+  .diff[data-on="1"][data-d="Hard"]{background:var(--revise-bg);color:var(--revise-fg);border-color:var(--revise-line);}
+  .composer .actions{display:flex;justify-content:flex-end;margin-top:13px;}
+  .add{font-family:inherit;font-weight:600;font-size:13.5px;letter-spacing:.03em;background:var(--ink);color:var(--paper);border:none;border-radius:10px;padding:12px 22px;cursor:pointer;transition:transform .12s;}
+  .add:hover{transform:translateY(-1px);}
+
+  .stats-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+  .stat{border-radius:13px;padding:13px 14px;border:1px solid transparent;cursor:pointer;user-select:none;position:relative;transition:transform .12s, box-shadow .15s, filter .15s;}
+  .stat:hover{transform:translateY(-2px);filter:brightness(1.02);}
+  .stat:active{transform:translateY(0);}
+  .stat.active{box-shadow:inset 0 0 0 2px currentColor, var(--shadow);}
+  .stat.active::after{content:"▾";position:absolute;top:9px;right:12px;font-size:12px;opacity:.7;}
+  .stat .n{font-family:'Fraunces',serif;font-weight:600;font-size:28px;line-height:1;}
+  .stat .l{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;opacity:.85;}
+  .stat .r{font-size:10px;opacity:.7;margin-top:2px;}
+  .stat.big{display:flex;align-items:center;gap:13px;padding:14px 16px;}
+  .stat.big .ico{font-size:24px;line-height:1;}
+  .stat.big .n{font-size:30px;}
+  .s-fresh{background:var(--fresh-bg);color:var(--fresh-fg);border-color:var(--fresh-line);}
+  .s-settle{background:var(--settle-bg);color:var(--settle-fg);border-color:var(--settle-line);}
+  .s-fade{background:var(--fade-bg);color:var(--fade-fg);border-color:var(--fade-line);}
+  .s-revise{background:var(--revise-bg);color:var(--revise-fg);border-color:var(--revise-line);}
+  .s-master{background:var(--master-bg);color:var(--master-fg);border-color:var(--master-line);}
+  .s-focus{background:var(--focus-bg);color:var(--focus-fg);border-color:var(--focus-line);}
+
+  .searchbar{margin-bottom:16px;}
+  .searchbar input{width:100%;}
+
+  .group{margin-bottom:22px;}
+  .group-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px;}
+  .dot{width:10px;height:10px;border-radius:50%;flex:none;}
+  .group-name{font-family:'Fraunces',serif;font-weight:600;font-size:18px;letter-spacing:-.01em;}
+  .group-range{font-size:11px;color:var(--ink-faint);letter-spacing:.04em;}
+  .group-count{margin-left:auto;font-size:12px;color:var(--ink-faint);}
+  .g-fresh .dot{background:var(--fresh-fg);} .g-settle .dot{background:var(--settle-fg);}
+  .g-fade .dot{background:var(--fade-fg);}  .g-revise .dot{background:var(--revise-fg);}
+  .g-master .dot{background:var(--master-fg);} .g-focus .dot{background:var(--focus-fg);}
+
+  .item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:13px 14px;margin-bottom:8px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .15s;animation:pop .28s ease both;}
+  .item:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(40,35,25,.05),0 12px 28px rgba(40,35,25,.08);}
+  .it-fresh{border-left-color:var(--fresh-fg);} .it-settle{border-left-color:var(--settle-fg);}
+  .it-fade{border-left-color:var(--fade-fg);}   .it-revise{border-left-color:var(--revise-fg);}
+  .it-master{border-left-color:var(--master-fg);} .it-focus{border-left-color:var(--focus-fg);}
+
+  .badge{flex:none;width:62px;text-align:center;border-radius:9px;padding:8px 4px;}
+  .badge .bd{font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1;}
+  .badge .bl{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;opacity:.8;}
+  .it-fresh .badge{background:var(--fresh-bg);color:var(--fresh-fg);}
+  .it-settle .badge{background:var(--settle-bg);color:var(--settle-fg);}
+  .it-fade .badge{background:var(--fade-bg);color:var(--fade-fg);}
+  .it-revise .badge{background:var(--revise-bg);color:var(--revise-fg);}
+  .it-master .badge{background:var(--master-bg);color:var(--master-fg);font-size:20px;}
+  .it-focus .badge{background:var(--focus-bg);color:var(--focus-fg);font-size:20px;}
+  .badge .icobig{font-size:22px;line-height:1.4;}
+
+  .meta{flex:1;min-width:0;}
+  .qname{font-size:15px;color:var(--ink);font-weight:500;word-break:break-word;}
+  .sub{display:flex;align-items:center;gap:9px;margin-top:5px;flex-wrap:wrap;}
+  .tag{font-size:10px;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;padding:2px 7px;border:1px solid var(--line);color:var(--ink-faint);}
+  .tag.Easy{background:var(--fresh-bg);color:var(--fresh-fg);border-color:var(--fresh-line);}
+  .tag.Medium{background:var(--settle-bg);color:var(--settle-fg);border-color:var(--settle-line);}
+  .tag.Hard{background:var(--revise-bg);color:var(--revise-fg);border-color:var(--revise-line);}
+  .date{font-size:11px;color:var(--ink-faint);}
+  .counts{display:inline-flex;gap:11px;font-size:11px;letter-spacing:.16em;}
+  .counts .c-ok{color:var(--fresh-fg);} .counts .c-no{color:var(--revise-fg);}
+  .counts span small{font-family:'JetBrains Mono';letter-spacing:0;opacity:.7;margin-left:3px;}
+
+  .right{flex:none;display:flex;align-items:center;gap:8px;}
+  .up{display:flex;gap:6px;}
+  .up button{font-family:inherit;font-size:12px;font-weight:600;border-radius:9px;padding:9px 11px;cursor:pointer;border:1px solid;transition:all .14s;white-space:nowrap;}
+  .up .ok{background:var(--fresh-bg);color:var(--fresh-fg);border-color:var(--fresh-line);}
+  .up .ok:hover{background:var(--fresh-fg);color:#fff;}
+  .up .no{background:var(--revise-bg);color:var(--revise-fg);border-color:var(--revise-line);}
+  .up .no:hover{background:var(--revise-fg);color:#fff;}
+  .up-wait{font-size:10.5px;color:var(--ink-faint);text-align:right;line-height:1.4;max-width:96px;}
+  .up-wait b{color:var(--ink-soft);font-weight:600;}
+  .ic{border:1px solid var(--line);background:var(--paper);border-radius:9px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer;color:var(--ink-soft);transition:all .14s;font-size:14px;}
+  .ic.retrack:hover{border-color:var(--settle-fg);color:var(--settle-fg);background:var(--settle-bg);}
+  .ic.del:hover{border-color:var(--revise-fg);color:var(--revise-fg);background:var(--revise-bg);}
+
+  .empty{text-align:center;padding:54px 20px;color:var(--ink-faint);}
+  .empty .big{font-family:'Fraunces',serif;font-style:italic;font-size:22px;color:var(--ink-soft);margin-bottom:8px;}
+  .empty .small{font-size:13px;}
+
+  .footnote{margin-top:30px;padding-top:18px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink-faint);letter-spacing:.02em;line-height:1.8;}
+  .footnote b{color:var(--ink-soft);}
+
+  @keyframes pop{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  @media(max-width:600px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .clock{display:none;}
+    .item{flex-wrap:wrap;}
+    .right{margin-left:auto;}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="title">Up<em>solve</em></div>
+      <div class="tagline">// log it · let the clock run · upsolve at 3 · 7 · 30 days</div>
+    </div>
+    <div class="clock"><b id="clkDate"></b><span id="clkTime"></span></div>
+  </header>
+
+  <div class="composer">
+    <div class="row1">
+      <input type="text" id="qInput" placeholder="Question name  (e.g. 239. Sliding Window Maximum)" autocomplete="off"/>
+      <input type="date" id="dInput"/>
+    </div>
+    <div class="diffs" id="diffs">
+      <span class="diff" data-d="Easy" data-on="0">Easy</span>
+      <span class="diff" data-d="Medium" data-on="0">Medium</span>
+      <span class="diff" data-d="Hard" data-on="0">Hard</span>
+    </div>
+    <div class="actions"><button class="add" id="addBtn">+ Add solve</button></div>
+  </div>
+
+  <div class="stats-top" id="statsTop"></div>
+  <div class="stats" id="stats"></div>
+
+  <div class="searchbar"><input type="text" id="search" placeholder="Search your solved problems…" autocomplete="off"/></div>
+
+  <div id="list"></div>
+
+  <div class="footnote">
+    <b>How upsolving works:</b> a problem becomes due at the 3-, then 7-, then 30-day mark.
+    Hit <b>✓ Solved</b> if you cleared it yourself — the clock keeps running so it rolls to the next checkpoint.
+    Hit <b>✗ Missed</b> if you couldn't — the clock resets to today and it starts over.
+    <b>3 upsolves in a row → Mastered.</b> A single ✗ Missed breaks the streak: the success count drops back to 0,
+    the clock resets, and the 3·7·30 progression starts over. &nbsp; 3 misses total → <b>Focus more</b>. &nbsp; One upsolve per problem per day.
+  </div>
+</div>
+
+<script>
+(function(){
+  const KEY='dsa-upsolve:items', DAY=86400000, CHECKPOINTS=[3,7,30], GOAL=3;
+
+  const hasWinStore = typeof window!=='undefined' && window.storage && typeof window.storage.get==='function';
+  let mem=[];
+  async function load(){
+    // 1) Claude in-artifact storage (if present)
+    if(hasWinStore){ try{ const r=await window.storage.get(KEY); if(r&&r.value) return JSON.parse(r.value); }catch(e){} }
+    // 2) browser localStorage (persists when opened in a normal browser)
+    try{ const v=localStorage.getItem(KEY); if(v) return JSON.parse(v); }catch(e){}
+    // 3) in-memory (lasts only for this session)
+    return mem;
+  }
+  async function save(items){
+    mem=items; const json=JSON.stringify(items);
+    if(hasWinStore){ try{ await window.storage.set(KEY,json); }catch(e){} }
+    try{ localStorage.setItem(KEY,json); }catch(e){}
+  }
+
+  const BUCKETS=[
+    {key:'fresh', name:'Fresh',   range:'0 – 3 days',  cls:'g-fresh', itcls:'it-fresh', scls:'s-fresh', note:'just solved'},
+    {key:'settle',name:'Settling',range:'4 – 7 days',  cls:'g-settle',itcls:'it-settle',scls:'s-settle',note:'review soon'},
+    {key:'fade',  name:'Fading',  range:'8 – 30 days', cls:'g-fade',  itcls:'it-fade',  scls:'s-fade',  note:'getting cold'},
+    {key:'revise',name:'Revise',  range:'30+ days',    cls:'g-revise',itcls:'it-revise',scls:'s-revise',note:'overdue'},
+  ];
+
+  const $=s=>document.querySelector(s);
+  function todayStr(){ const d=new Date(),o=d.getTimezoneOffset(); return new Date(d-o*60000).toISOString().slice(0,10); }
+  function fmt(ts){ return new Date(ts).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}); }
+  function esc(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function daysSince(ts){ const a=new Date();a.setHours(0,0,0,0); const b=new Date(ts);b.setHours(0,0,0,0); return Math.max(0,Math.round((a-b)/DAY)); }
+  function dayLabel(d){ return d===0?'today':d+'d ago'; }
+  function bucketOf(d){ return d<=3?'fresh':d<=7?'settle':d<=30?'fade':'revise'; }
+  function dots(n,max){ let s=''; for(let i=0;i<max;i++) s+= i<n?'●':'○'; return s; }
+
+  // success>=3 -> mastered ; fail>=3 -> focus (focus takes priority)
+  function termOf(it){
+    if((it.failCount||0)>=GOAL) return 'focus';
+    if((it.successCount||0)>=GOAL) return 'master';
+    return null;
+  }
+  function upsolveState(it){
+    if(termOf(it)) return {state:'terminal'};
+    const s=it.successCount||0, days=daysSince(it.solvedAt), cp=CHECKPOINTS[s];
+    if(it.lastUpsolveDate===todayStr()) return {state:'done-today'};
+    if(days>=cp) return {state:'due',cp};
+    return {state:'waiting',remaining:cp-days,cp};
+  }
+
+  let items=[], chosenDiff=null, selectedCat=null;
+
+  const CAT_META={
+    focus :{cls:'g-focus', name:'Focus more', range:'3 misses · keep grinding'},
+    fresh :{cls:'g-fresh', name:'Fresh',      range:'0 – 3 days · just solved'},
+    settle:{cls:'g-settle',name:'Settling',   range:'4 – 7 days · review soon'},
+    fade  :{cls:'g-fade',  name:'Fading',     range:'8 – 30 days · getting cold'},
+    revise:{cls:'g-revise',name:'Revise',     range:'30+ days · overdue'},
+    master:{cls:'g-master',name:'Mastered',   range:'cleared 3·7·30 day checks'},
+  };
+  const CAT_ORDER=['focus','fresh','settle','fade','revise','master'];
+
+  function catOf(it){ const t=termOf(it); return t ? t : bucketOf(daysSince(it.solvedAt)); }
+  function itemsFor(cat,pool){
+    const list=pool.filter(it=>catOf(it)===cat);
+    if(cat==='master') return list.sort((a,b)=>b.createdAt-a.createdAt);
+    return list.sort((a,b)=>daysSince(b.solvedAt)-daysSince(a.solvedAt));
+  }
+  function buildSection(cat,list){
+    const m=CAT_META[cat];
+    const body = (cat==='focus'||cat==='master')
+      ? list.map(it=>termCard(it,cat,cat==='focus'?'◎':'★')).join('')
+      : list.map(it=>activeCard(it,BUCKETS.find(b=>b.key===cat))).join('');
+    return section({cls:m.cls,name:m.name,range:m.range,count:list.length}, body);
+  }
+
+  function render(){
+    const q=$('#search').value.trim().toLowerCase();
+    const counts={fresh:0,settle:0,fade:0,revise:0,master:0,focus:0};
+    items.forEach(it=>counts[catOf(it)]++);
+
+    const act=c=> selectedCat===c?' active':'';
+    $('#statsTop').innerHTML=`
+      <div class="stat big s-master${act('master')}" data-cat="master"><span class="ico">★</span><div><div class="n">${counts.master}</div><div class="l">Mastered</div></div></div>
+      <div class="stat big s-focus${act('focus')}" data-cat="focus"><span class="ico">◎</span><div><div class="n">${counts.focus}</div><div class="l">Focus more</div></div></div>`;
+    $('#stats').innerHTML=BUCKETS.map(b=>`
+      <div class="stat ${b.scls}${act(b.key)}" data-cat="${b.key}"><div class="n">${counts[b.key]}</div><div class="l">${b.name}</div><div class="r">${b.range}</div></div>`).join('');
+
+    const list=$('#list');
+    if(items.length===0){
+      list.innerHTML=`<div class="empty"><div class="big">No problems logged yet.</div><div class="small">Add the first question you solved above ↑</div></div>`;
+      return;
+    }
+
+    // Search overrides selection: show all matches grouped by category
+    if(q){
+      const matched=items.filter(it=>it.name.toLowerCase().includes(q));
+      if(!matched.length){ list.innerHTML=`<div class="empty"><div class="big">Nothing matches “${esc(q)}”.</div></div>`; return; }
+      list.innerHTML=CAT_ORDER.map(c=>{ const l=itemsFor(c,matched); return l.length?buildSection(c,l):''; }).join('');
+      return;
+    }
+
+    // Nothing selected → prompt to tap a block
+    if(!selectedCat){
+      list.innerHTML=`<div class="empty"><div class="big">Tap a block above.</div><div class="small">Pick a category to see those problems.</div></div>`;
+      return;
+    }
+
+    // Show only the selected category
+    const sel=itemsFor(selectedCat,items);
+    list.innerHTML= sel.length
+      ? buildSection(selectedCat,sel)
+      : `<div class="empty"><div class="big">Nothing in ${CAT_META[selectedCat].name}.</div><div class="small">Tap the block again to close.</div></div>`;
+  }
+
+  function section(h,inner){
+    return `<div class="group ${h.cls}"><div class="group-head"><span class="dot"></span>
+      <span class="group-name">${h.name}</span><span class="group-range">${h.range}</span>
+      <span class="group-count">${h.count}</span></div>${inner}</div>`;
+  }
+
+  function countsHtml(it){
+    return `<span class="counts">
+      <span class="c-ok">✓ ${dots(it.successCount||0,GOAL)}<small>${it.successCount||0}/${GOAL}</small></span>
+      <span class="c-no">✗ ${dots(it.failCount||0,GOAL)}<small>${it.failCount||0}/${GOAL}</small></span></span>`;
+  }
+
+  function activeCard(it,b){
+    const days=daysSince(it.solvedAt), us=upsolveState(it);
+    let right='';
+    if(us.state==='due'){
+      right=`<div class="up"><button class="ok" data-act="solved">✓ Solved</button><button class="no" data-act="missed">✗ Missed</button></div>`;
+    }else if(us.state==='waiting'){
+      right=`<div class="up-wait">${us.cp}-day check<br><b>in ${us.remaining}d</b></div>`;
+    }else if(us.state==='done-today'){
+      right=`<div class="up-wait">upsolved<br><b>today ✓</b></div>`;
+    }
+    return `<div class="item ${b.itcls}" data-id="${it.id}">
+      <div class="badge"><div class="bd">${days}</div><div class="bl">${days===0?'today':'days'}</div></div>
+      <div class="meta"><div class="qname">${esc(it.name)}</div>
+        <div class="sub">${it.difficulty?`<span class="tag ${it.difficulty}">${it.difficulty}</span>`:''}
+          <span class="date">solved ${fmt(it.solvedAt)} · ${dayLabel(days)}</span>${countsHtml(it)}</div>
+      </div>
+      <div class="right">${right}<button class="ic del" title="Delete">&#10005;</button></div>
+    </div>`;
+  }
+
+  function termCard(it,kind,icon){
+    return `<div class="item it-${kind}" data-id="${it.id}">
+      <div class="badge"><span class="icobig">${icon}</span></div>
+      <div class="meta"><div class="qname">${esc(it.name)}</div>
+        <div class="sub">${it.difficulty?`<span class="tag ${it.difficulty}">${it.difficulty}</span>`:''}
+          <span class="date">added ${fmt(it.createdAt)}</span>${countsHtml(it)}</div>
+      </div>
+      <div class="right">
+        <button class="ic retrack" title="Reset progress & track again">&#8635;</button>
+        <button class="ic del" title="Delete">&#10005;</button>
+      </div>
+    </div>`;
+  }
+
+  async function addItem(){
+    const inp=$('#qInput'), name=inp.value.trim();
+    if(!name){ inp.focus(); return; }
+    const dv=$('#dInput').value||todayStr(), [y,m,d]=dv.split('-').map(Number);
+    const solvedAt=new Date(y,m-1,d,12,0,0).getTime();
+    items.unshift({id:'q'+Date.now()+Math.random().toString(36).slice(2,6),name,difficulty:chosenDiff,
+      solvedAt,createdAt:Date.now(),successCount:0,failCount:0,lastUpsolveDate:null});
+    inp.value=''; chosenDiff=null; document.querySelectorAll('.diff').forEach(x=>x.dataset.on='0');
+    $('#dInput').value=todayStr(); await save(items); render(); inp.focus();
+  }
+
+  function onListClick(e){
+    const card=e.target.closest('.item'); if(!card) return;
+    const it=items.find(x=>x.id===card.dataset.id); if(!it) return;
+    const act=e.target.closest('[data-act]')?.dataset.act;
+
+    if(e.target.closest('.del')){ items=items.filter(x=>x.id!==it.id); save(items); render(); return; }
+    if(e.target.closest('.retrack')){ it.successCount=0; it.failCount=0; it.lastUpsolveDate=null; it.solvedAt=Date.now(); save(items); render(); return; }
+    if(act==='solved'){ it.successCount=(it.successCount||0)+1; it.lastUpsolveDate=todayStr(); save(items); render(); return; } // clock NOT reset
+    if(act==='missed'){ it.successCount=0; it.failCount=(it.failCount||0)+1; it.lastUpsolveDate=todayStr(); it.solvedAt=Date.now(); save(items); render(); return; } // streak broken + clock reset
+  }
+
+  function tickClock(){ const n=new Date();
+    $('#clkDate').textContent=n.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+    $('#clkTime').textContent=n.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+  }
+
+  async function init(){
+    $('#dInput').value=todayStr();
+    items=(await load()).map(it=>({successCount:0,failCount:0,lastUpsolveDate:null,...it}));
+    render(); tickClock();
+    $('#addBtn').addEventListener('click',addItem);
+    $('#qInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addItem(); });
+    $('#search').addEventListener('input',render);
+    $('#list').addEventListener('click',onListClick);
+    function onStatClick(e){
+      const tile=e.target.closest('[data-cat]'); if(!tile) return;
+      const cat=tile.dataset.cat;
+      selectedCat = selectedCat===cat ? null : cat;
+      $('#search').value='';
+      render();
+    }
+    $('#statsTop').addEventListener('click',onStatClick);
+    $('#stats').addEventListener('click',onStatClick);
+    document.querySelectorAll('.diff').forEach(el=>el.addEventListener('click',()=>{
+      const on=el.dataset.on==='1'; document.querySelectorAll('.diff').forEach(x=>x.dataset.on='0');
+      if(!on){ el.dataset.on='1'; chosenDiff=el.dataset.d; } else chosenDiff=null;
+    }));
+    setInterval(tickClock,30000); setInterval(render,60000);
+  }
+  init();
+})();
+</script>
